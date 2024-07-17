@@ -2,5 +2,6 @@
 *.py[cod]
 .web
 __pycache__/
-venv/
 uploaded_files/
+venv/
+test_data/
