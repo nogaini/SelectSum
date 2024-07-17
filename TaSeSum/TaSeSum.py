@@ -4,11 +4,8 @@ from TaSeSum.components.summary_card import SummaryCard, render_summary_card
 from TaSeSum.components.topic_chips import TopicChipsSelector, TopicChipsState
 
 from src.audio_utils import extract_audio_from_video
-from src.transcription import (
-    load_stable_whisper_model,
-    merge_segments_primary,
-    merge_segments_secondary,
-)
+from src.transcription import load_stable_whisper_model
+from src.segment_utils import merge_segments_primary, merge_segments_secondary
 from src.topic_modelling import (
     load_topic_model,
     add_topic_to_segments,
@@ -18,6 +15,7 @@ from src.topic_modelling import (
 class State(UploaderState):
     segments: list[list[dict]]
     topic_dict: dict[int, list[str]]
+    ids_in_view: list[int]
 
     async def load(self):
         self.transcription_model = load_stable_whisper_model("tiny")
