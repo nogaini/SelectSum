@@ -8,7 +8,9 @@ def load_topic_model() -> BERTopic:
     return topic_model
 
 
-def add_topic_to_segments(segments: list[dict], topic_model: BERTopic) -> list[dict]:
+def add_topic_to_segments(
+    segments: list[dict], topic_model: BERTopic
+) -> tuple[list[dict], dict[int, list[str]]]:
     segments_with_topics = []
     docs = [segment["text"].strip() for segment in segments]
     topics, _ = topic_model.fit_transform(docs)
@@ -17,9 +19,9 @@ def add_topic_to_segments(segments: list[dict], topic_model: BERTopic) -> list[d
     for topic_id, segment in zip(topics, segments):
         segment_with_topic = segment
         segment_with_topic["topic_id"] = topic_id
-        segment_with_topic["topic_tags"] = topic_dict[topic_id]
+        segment_with_topic["topic_tags"] = " | ".join(topic_dict[topic_id][:5])
         segments_with_topics.append(segment_with_topic)
-    return segments_with_topics
+    return segments_with_topics, topic_dict
 
 
 def get_topic_dict(topic_model) -> dict[int]:
