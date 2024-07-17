@@ -47,12 +47,12 @@ def Uploader() -> rx.Component:
             ),
         ),
         rx.cond(
-            UploadState.progress,
-            rx.progress(value=UploadState.progress, max=100),
+            UploaderState.progress,
+            rx.progress(value=UploaderState.progress, max=100),
         ),
         rx.cond(
-            UploadState.video_path,
-            rx.text(f"Selected file: {UploadState.video_path}"),
+            UploaderState.video_path,
+            rx.text(f"Selected file: {UploaderState.video_path}"),
         ),
         width="100%",
     )
