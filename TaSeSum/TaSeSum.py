@@ -1,5 +1,6 @@
 import reflex as rx
-from TaSeSum.components.upload import UploadComponent, UploadState
+from TaSeSum.components.upload import Uploader, UploaderState
+from TaSeSum.components.summary_card import SummaryCard, render_summary_card
 
 from src.audio_utils import extract_audio_from_video
 from src.transcription import (
@@ -13,7 +14,10 @@ from src.topic_modelling import (
 )
 
 
-class State(UploadState):
+class State(UploaderState):
+    viz_ready: bool = False
+    segments: list[list[dict]]
+
     async def load(self):
         self.transcription_model = load_stable_whisper_model("tiny")
         self.topic_model = load_topic_model()
@@ -30,14 +34,21 @@ class State(UploadState):
         segments_with_topic = add_topic_to_segments(segments, self.topic_model)
         segments = merge_segments_secondary(segments_with_topic)
 
+        async with self:
+            self.viz_ready = True
+
 
 @rx.page(on_load=State.load)
 def index() -> rx.Component:
     return rx.flex(
-        UploadComponent(),
+        Uploader(),
         rx.cond(
             State.video_path,
             rx.button("Process", type="submit", on_click=State.process_video),
+        ),
+        rx.cond(
+            State.viz_ready,
+            rx.foreach(State.segments, render_summary_card)
         ),
         align="center",
         justify="center",

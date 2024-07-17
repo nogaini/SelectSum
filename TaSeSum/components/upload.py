@@ -1,7 +1,7 @@
 import reflex as rx
 
 
-class UploadState(rx.State):
+class UploaderState(rx.State):
     video_path: str
     progress: int = 0
 
@@ -18,7 +18,7 @@ class UploadState(rx.State):
             file_object.write(upload_data)
 
 
-def UploadComponent() -> rx.Component:
+def Uploader() -> rx.Component:
     return rx.container(
         rx.upload(
             rx.flex(
@@ -39,10 +39,10 @@ def UploadComponent() -> rx.Component:
             id="upload",
             border="1px dotted rgb(107,99,246)",
             padding="5em",
-            on_drop=UploadState.handle_upload(
+            on_drop=UploaderState.handle_upload(
                 rx.upload_files(
                     upload_id="upload",
-                    on_upload_progress=UploadState.handle_upload_progress,
+                    on_upload_progress=UploaderState.handle_upload_progress,
                 )
             ),
         ),
