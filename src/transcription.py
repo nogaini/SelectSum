@@ -31,11 +31,23 @@ def group_segments_by_word_count(segments: list[dict]) -> list[list[dict]]:
 
 
 def group_segments_by_topic(segments: list[dict]) -> list[list[dict]]:
-    grouped_segments = []
-    group = []
+    if not segments:
+        return []
 
-    for segment in segments:
-        topic_id = segment["topic_id"]
+    grouped_segments = []
+
+    prev_topic = segments[0]["topic_id"]
+    group = [segments[0]]
+    for segment in segments[1:]:
+        topic = segment["topic_id"]
+        if topic == prev_topic:
+            group.append(segment)
+        else:
+            grouped_segments.append(group)
+            group = [segment]
+            prev_topic = topic
+    grouped_segments.append(group)
+    return grouped_segments
 
 
 def merge_segments_secondary(segments: list[dict]) -> list[list[dict]]:
@@ -81,4 +93,6 @@ def merge_segments_in_group(group: list[dict]) -> dict:
     merged_segment["end"] = group[-1]["end"]
     merged_segment["words"] = merged_words
     merged_segment["no_speech_prob"] = no_speech_probs
+    merged_segment["topic_id"] = segment.get("topic_id", None)
+    merged_segment["topic_tags"] = segment.get("topic_tags", None)
     return merged_segment

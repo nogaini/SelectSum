@@ -10,7 +10,6 @@ from src.transcription import (
 from src.topic_modelling import (
     load_topic_model,
     add_topic_to_segments,
-    get_topic_dict,
 )
 
 
@@ -29,7 +28,6 @@ class State(UploadState):
         # Segment merging
         segments = merge_segments_primary(result_dict["segments"])
         segments_with_topic = add_topic_to_segments(segments, self.topic_model)
-        topic_dict = get_topic_dict(self.topic_model)
         segments = merge_segments_secondary(segments_with_topic)
 
 
