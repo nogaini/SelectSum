@@ -2,6 +2,7 @@ import reflex as rx
 from reflex.components.radix.themes.base import (
     LiteralAccentColor,
 )
+from TaSeSum.state import CommonState
 
 chip_props = {
     "radius": "full",
@@ -18,20 +19,17 @@ status_chip_props = {
 }
 
 
-class TopicChipsState(rx.State):
-    selected_items_ids: list[int] = ...
-    selected_items: list[str] = skills[:3]
-
-    def add_selected(self, item: str):
+class TopicChipsState(CommonState):
+    async def add_selected(self, item: str):
         self.selected_items.append(item)
 
-    def remove_selected(self, item: str):
+    async def remove_selected(self, item: str):
         self.selected_items.remove(item)
 
-    def add_all_selected(self):
-        self.selected_items = list(skills)
+    async def add_all_selected(self):
+        self.selected_items = self.all_items
 
-    def clear_selected(self):
+    async def clear_selected(self):
         self.selected_items.clear()
 
 
@@ -135,7 +133,7 @@ def TopicChipsSelector() -> rx.Component:
         rx.divider(),
         # Unselected Items
         rx.flex(
-            rx.foreach(skills, unselected_item_chip),
+            rx.foreach(TopicChipsState.selected_items, unselected_item_chip),
             wrap="wrap",
             spacing="2",
             justify_content="start",

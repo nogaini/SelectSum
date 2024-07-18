@@ -2,6 +2,7 @@
 *.py[cod]
 .web
 __pycache__/
+assets/external/
+test_data/
 uploaded_files/
 venv/
-test_data/

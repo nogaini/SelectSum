@@ -1,5 +1,5 @@
 import reflex as rx
-from topic_chips import status_chip
+from TaSeSum.components.topic_chips import status_chip
 
 
 class SummaryCardState(rx.State):
@@ -12,7 +12,7 @@ class SummaryCardState(rx.State):
     in_view: bool = True
 
     @rx.background
-    async def generate_summary():
+    async def generate_summary(self):
         pass
 
 
@@ -20,11 +20,11 @@ def render_bullet(bullet: str) -> rx.Component:
     return rx.text(bullet)
 
 
-def render_summary_card(segment: list[dict]) -> rx.Component:
-    rx.card(
+def render_summary_card(segment: dict) -> rx.Component:
+    return rx.card(
         rx.flex(
             rx.inset(
-                rx.image(segment["word_cloud_img_path"]),
+                rx.image(rx.get_upload_url(segment["wordcloud_img_path"])),
                 side="top",
                 pb="current",
             ),
@@ -46,7 +46,3 @@ def render_summary_card(segment: list[dict]) -> rx.Component:
             direction="column",
         ),
     )
-
-
-def SummaryCard() -> rx.Component:
-    pass

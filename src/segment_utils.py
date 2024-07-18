@@ -1,4 +1,6 @@
-WORDS_PER_CHUNK = 1500
+from src.text_utils import WordCloudGenerator
+
+WORDS_PER_CHUNK = 200
 
 
 def group_segments_by_word_count(segments: list[dict]) -> list[list[dict]]:
@@ -14,6 +16,8 @@ def group_segments_by_word_count(segments: list[dict]) -> list[list[dict]]:
             grouped_segments.append(group)
             group = []
             word_count = 0
+    if group:
+        grouped_segments.append(group)
     return grouped_segments
 
 
@@ -33,7 +37,8 @@ def group_segments_by_topic(segments: list[dict]) -> list[list[dict]]:
             grouped_segments.append(group)
             group = [segment]
             prev_topic = topic
-    grouped_segments.append(group)
+    if group:
+        grouped_segments.append(group)
     return grouped_segments
 
 
@@ -66,6 +71,16 @@ def filter_segments_by_duration(
     return filtered_segments
 
 
+def filter_segments_by_topic_id(
+    segments: list[dict], topic_id_list: list[int]
+) -> list[dict]:
+    filtered_segments = []
+    for segment in segments:
+        if segment["topic_id"] in topic_id_list:
+            filtered_segments.append(segment)
+    return filtered_segments
+
+
 def merge_segments_in_group(group: list[dict]) -> dict:
     merged_segment = {}
     merged_text = ""
@@ -83,3 +98,12 @@ def merge_segments_in_group(group: list[dict]) -> dict:
     merged_segment["topic_id"] = segment.get("topic_id", None)
     merged_segment["topic_tags"] = segment.get("topic_tags", None)
     return merged_segment
+
+
+def add_wordcloud_to_segments(
+    segments: list[dict], wc_generator: WordCloudGenerator
+) -> list[dict]:
+    for segment in segments:
+        wc_path = wc_generator.generate_word_cloud(segment["text"])
+        segment["wordcloud_img_path"] = wc_path
+    return segments
