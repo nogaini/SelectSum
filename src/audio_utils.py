@@ -1,6 +1,7 @@
+import os
 import ffmpeg
 
-AUDIO_FOLDER = "/home/jobin/Projects/TaSeSum/uploaded_files/audio"
+AUDIO_FOLDER = f"{os.getcwd()}/uploaded_files/audio"
 
 
 def extract_audio_from_video(video_path: str) -> str:

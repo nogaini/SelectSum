@@ -1,7 +1,7 @@
 import reflex as rx
-from TaSeSum.components.upload import Uploader, UploaderState
+from TaSeSum.components.upload import Uploader
 from TaSeSum.components.summary_card import render_summary_card
-from TaSeSum.components.topic_chips import TopicChipsSelector, TopicChipsState
+from TaSeSum.components.topic_chips import TopicChipsSelector
 from TaSeSum.state import CommonState
 
 from src.text_utils import WordCloudGenerator
@@ -19,9 +19,6 @@ from src.topic_modelling import (
 
 
 class IndexState(CommonState):
-    segments: list[dict]
-    topic_dict: dict[int, list[str]] = None
-
     async def load(self):
         self.transcription_model = load_stable_whisper_model("tiny")
         self.topic_model = load_topic_model()
@@ -38,7 +35,7 @@ class IndexState(CommonState):
         # Segment merging
         segments = merge_segments_primary(segments)
 
-        segments_with_topic, topic_dict, all_topic_tags = add_topic_to_segments(
+        segments_with_topic, all_topic_tags = add_topic_to_segments(
             segments, self.topic_model
         )
         segments = merge_segments_secondary(segments_with_topic)
@@ -46,6 +43,7 @@ class IndexState(CommonState):
 
         async with self:
             self.segments = segments
+            self.segments_in_view = segments
             self.selected_items = all_topic_tags
 
 
@@ -57,10 +55,10 @@ def index() -> rx.Component:
             IndexState.video_path,
             rx.button("Process", type="submit", on_click=IndexState.process_video),
         ),
-        rx.cond(IndexState.selected_items, TopicChipsSelector()),
+        rx.cond(IndexState.segments, TopicChipsSelector()),
         rx.cond(
             IndexState.selected_items,
-            rx.foreach(IndexState.segments, render_summary_card),
+            rx.foreach(IndexState.segments_in_view, render_summary_card),
         ),
         align="center",
         justify="center",

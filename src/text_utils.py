@@ -2,8 +2,9 @@ from wordcloud import WordCloud
 from rake_nltk import Rake
 import random
 import string
+import os
 
-WORDCLOUD_FOLDER = "/home/jobin/Projects/TaSeSum/uploaded_files/wordclouds"
+WORDCLOUD_FOLDER = f"{os.getcwd()}/uploaded_files/wordclouds"
 RX_WORDCLOUD_FOLDER = "wordclouds"
 
 

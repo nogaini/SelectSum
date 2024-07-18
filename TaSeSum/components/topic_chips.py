@@ -20,17 +20,28 @@ status_chip_props = {
 
 
 class TopicChipsState(CommonState):
-    async def add_selected(self, item: str):
+    def update_segments_in_view(self):
+        self.segments_in_view = [
+            segment
+            for segment in self.segments
+            if segment["topic_tags"] in self.selected_items
+        ]
+
+    def add_selected(self, item: str):
         self.selected_items.append(item)
+        self.update_segments_in_view()
 
-    async def remove_selected(self, item: str):
+    def remove_selected(self, item: str):
         self.selected_items.remove(item)
+        self.update_segments_in_view()
 
-    async def add_all_selected(self):
-        self.selected_items = self.all_items
+    def add_all_selected(self):
+        self.selected_items = [segment["topic_tags"] for segment in self.segments]
+        self.update_segments_in_view()
 
-    async def clear_selected(self):
+    def clear_selected(self):
         self.selected_items.clear()
+        self.update_segments_in_view()
 
 
 def action_button(
@@ -133,7 +144,7 @@ def TopicChipsSelector() -> rx.Component:
         rx.divider(),
         # Unselected Items
         rx.flex(
-            rx.foreach(TopicChipsState.selected_items, unselected_item_chip),
+            rx.foreach(TopicChipsState.all_items, unselected_item_chip),
             wrap="wrap",
             spacing="2",
             justify_content="start",
