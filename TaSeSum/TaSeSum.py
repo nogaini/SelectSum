@@ -45,6 +45,7 @@ class IndexState(CommonState):
             self.segments = segments
             self.segments_in_view = segments
             self.selected_items = all_topic_tags
+            self.all_items = all_topic_tags
 
 
 @rx.page(on_load=IndexState.load)
