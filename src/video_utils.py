@@ -1,7 +1,9 @@
 import ffmpeg
-from utils import generate_random_string
+import os
+from src.text_utils import generate_random_string
 
-TRIMS_FOLDER = "/home/jobin/Projects/TaSeSum/uploaded_files/trims"
+TRIMS_FOLDER = f"{os.getcwd()}/uploaded_files/trims"
+RX_TRIMS_FOLDER = "trims"
 
 
 def get_video_duration(video_path: str):
@@ -13,7 +15,7 @@ def get_video_duration(video_path: str):
 def trim_video(
     video_path: str, start_time: float, end_time: float, offset: float = 0.0
 ) -> str:
-    filename = video_path.split("/")[-1].split(".")[0]
+    filename = str(video_path).split("/")[-1].split(".")[0]
     suffix = generate_random_string(10)
     trim_path = f"{TRIMS_FOLDER}/{filename}_{suffix}.mp4"
 
@@ -34,4 +36,4 @@ def trim_video(
         .global_args("-loglevel", "error")
         .run(overwrite_output=True)
     )
-    return trim_path
+    return f"{RX_TRIMS_FOLDER}/{filename}_{suffix}.mp4"

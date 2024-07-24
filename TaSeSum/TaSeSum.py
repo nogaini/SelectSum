@@ -1,5 +1,6 @@
 import reflex as rx
 from TaSeSum.components.upload import Uploader
+
 from TaSeSum.components.summary_card import render_summary_card
 from TaSeSum.components.topic_chips import TopicChipsSelector
 from TaSeSum.state import CommonState
@@ -11,6 +12,7 @@ from src.segment_utils import (
     merge_segments_primary,
     merge_segments_secondary,
     add_wordcloud_to_segments,
+    add_idx_to_segments,
 )
 from src.topic_modelling import (
     load_topic_model,
@@ -32,13 +34,19 @@ class IndexState(CommonState):
         result_dict = result.to_dict()
         segments = result_dict["segments"]
 
-        # Segment merging
+        # Primary segment merging
         segments = merge_segments_primary(segments)
 
+        # Add topic tags
         segments_with_topic, all_topic_tags = add_topic_to_segments(
             segments, self.topic_model
         )
+
+        # Secondary segment merging
         segments = merge_segments_secondary(segments_with_topic)
+        segments = add_idx_to_segments(segments)
+
+        # Generate wordclouds
         segments = add_wordcloud_to_segments(segments, self.wc_generator)
 
         async with self:
@@ -59,7 +67,12 @@ def index() -> rx.Component:
         rx.cond(IndexState.segments, TopicChipsSelector()),
         rx.cond(
             IndexState.selected_items,
-            rx.foreach(IndexState.segments_in_view, render_summary_card),
+            rx.flex(
+                rx.foreach(IndexState.segments_in_view, render_summary_card),
+                gap=20,
+                align="start",
+                justify="center",
+            ),
         ),
         align="center",
         justify="center",

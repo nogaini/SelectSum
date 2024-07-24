@@ -36,7 +36,9 @@ class TopicChipsState(CommonState):
         self.update_segments_in_view()
 
     def add_all_selected(self):
-        self.selected_items = [segment["topic_tags"] for segment in self.segments]
+        self.selected_items = list(
+            set([segment["topic_tags"] for segment in self.segments])
+        )
         self.update_segments_in_view()
 
     def clear_selected(self):
