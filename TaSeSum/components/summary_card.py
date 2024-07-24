@@ -30,15 +30,17 @@ class SummaryCardState(UploaderState):
         summarizer = Summarizer()
 
         segment_idx = segment["idx"]
-        res = summarizer.summarize(segment["text"])
         trim_path = trim_video(self.video_path, segment["start"], segment["end"])
 
         async with self:
             self.data_dict[segment_idx] = {}
+            self.data_dict[segment_idx]["trimmed_video_path"] = trim_path
+
+        res = summarizer.summarize(segment["text"])
+        async with self:
             self.data_dict[segment_idx]["title"] = res.title
             self.data_dict[segment_idx]["summary"] = res.summary
             self.data_dict[segment_idx]["bullets"] = res.bullets
-            self.data_dict[segment_idx]["trimmed_video_path"] = trim_path
 
 
 def render_summary_card(segment: Segment) -> rx.Component:
@@ -47,35 +49,62 @@ def render_summary_card(segment: Segment) -> rx.Component:
         rx.flex(
             rx.inset(
                 rx.image(rx.get_upload_url(segment.wordcloud_img_path)),
+                width="640px",
+                height="auto",
                 side="top",
                 pb="current",
             ),
-            rx.text("Topics"),
-            status_chip(segment.topic_tags, "info", "blue"),
-            rx.divider(),
+            rx.flex(
+                status_chip(segment.topic_tags, "info", "blue"),
+                justify="center",
+            ),
             rx.button(
                 "Summarize",
                 on_click=SummaryCardState.generate_summary(segment),
             ),
             rx.cond(
                 SummaryCardState.data_dict[segment_idx],
-                rx.video(
-                    url=rx.get_upload_url(
-                        SummaryCardState.data_dict[segment_idx].trimmed_video_path
-                    )
+                rx.cond(
+                    SummaryCardState.data_dict[segment_idx].trimmed_video_path,
+                    rx.inset(
+                        rx.video(
+                            url=rx.get_upload_url(
+                                SummaryCardState.data_dict[
+                                    segment_idx
+                                ].trimmed_video_path
+                            ),
+                            width="640px",
+                            height="auto",
+                        ),
+                    ),
                 ),
             ),
-            rx.divider(),
             rx.cond(
                 SummaryCardState.data_dict[segment_idx],
-                rx.flex(
-                    rx.text(SummaryCardState.data_dict[segment_idx].title),
-                    rx.foreach(
-                        SummaryCardState.data_dict[segment_idx].bullets, rx.text
+                rx.cond(
+                    SummaryCardState.data_dict[segment_idx].title,
+                    rx.flex(
+                        rx.text(
+                            SummaryCardState.data_dict[segment_idx].title,
+                            size="7",
+                            align="center",
+                        ),
+                        rx.flex(
+                            rx.foreach(
+                                SummaryCardState.data_dict[segment_idx].bullets,
+                                rx.list.item,
+                            ),
+                            direction="column",
+                        ),
+                        direction="column",
+                        gap=10,
+                        align="center",
                     ),
-                    direction="column",
                 ),
             ),
             direction="column",
+            gap=30,
         ),
+        width="640px",
+        border="1px solid #00ff44",
     )

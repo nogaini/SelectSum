@@ -59,25 +59,42 @@ class IndexState(CommonState):
 @rx.page(on_load=IndexState.load)
 def index() -> rx.Component:
     return rx.flex(
+        rx.text(
+            rx.text.strong("SelectSum"),
+            ": Topic-based ",
+            rx.text.strong("Select"),
+            "ive ",
+            rx.text.strong("Sum"),
+            "marization of transcript-heavy videos",
+            size="9",
+        ),
         Uploader(),
         rx.cond(
             IndexState.video_path,
             rx.button("Process", type="submit", on_click=IndexState.process_video),
         ),
-        rx.cond(IndexState.segments, TopicChipsSelector()),
-        rx.cond(
-            IndexState.selected_items,
-            rx.flex(
-                rx.foreach(IndexState.segments_in_view, render_summary_card),
-                gap=20,
-                align="start",
-                justify="center",
+        rx.flex(
+            rx.cond(IndexState.segments, TopicChipsSelector()),
+            rx.cond(
+                IndexState.selected_items,
+                rx.flex(
+                    rx.foreach(IndexState.segments_in_view, render_summary_card),
+                    gap=50,
+                    align="start",
+                    justify="center",
+                    wrap="wrap",
+                ),
             ),
+            gap=150,
+            direction="column",
+            align="center",
+            justify="center",
+            margin=20,
         ),
         align="center",
         justify="center",
         direction="column",
-        margin=20,
+        margin=50,
         gap=20,
     )
 

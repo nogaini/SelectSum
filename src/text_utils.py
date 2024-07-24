@@ -21,7 +21,9 @@ class WordCloudGenerator:
     def generate_word_cloud(self, text: str) -> str:
         self.rake.extract_keywords_from_text(text)
         keywords = self.rake.get_ranked_phrases()
-        wordcloud = WordCloud().generate(" ".join(keywords))
+        wordcloud = WordCloud(height=480, width=640, max_words=20).generate(
+            " ".join(keywords)
+        )
 
         suffix = generate_random_string(10)
         save_path = f"{WORDCLOUD_FOLDER}/wordcloud_{suffix}.png"

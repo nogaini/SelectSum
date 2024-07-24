@@ -16,6 +16,7 @@ status_chip_props = {
     "radius": "full",
     "variant": "outline",
     "size": "3",
+    "width": "fit-content",
 }
 
 
@@ -69,6 +70,7 @@ def status_chip(status: str, icon: str, color: LiteralAccentColor) -> rx.Compone
         status,
         color_scheme=color,
         **status_chip_props,
+        
     )
 
 
@@ -153,5 +155,4 @@ def TopicChipsSelector() -> rx.Component:
         ),
         justify_content="start",
         align_items="start",
-        width="100%",
     )

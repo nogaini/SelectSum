@@ -1,10 +1,20 @@
 from bertopic import BERTopic
 from bertopic.representation import KeyBERTInspired
+from sklearn.feature_extraction.text import CountVectorizer
+from sentence_transformers import SentenceTransformer
 
 
 def load_topic_model() -> BERTopic:
     representation_model = KeyBERTInspired()
-    topic_model = BERTopic(representation_model=representation_model)
+    vectorizer_model = CountVectorizer(stop_words="english")
+    embedding_model = SentenceTransformer("BAAI/bge-base-en-v1.5")
+
+    topic_model = BERTopic(
+        representation_model=representation_model,
+        vectorizer_model=vectorizer_model,
+        embedding_model=embedding_model,
+        min_topic_size=2,
+    )
     return topic_model
 
 
