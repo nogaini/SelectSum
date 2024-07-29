@@ -1,13 +1,16 @@
 import reflex as rx
+from TaSeSum.state import CommonState
 
 
-class UploaderState(rx.State):
-    video_path: str
+class UploaderState(CommonState):
     progress: int = 0
 
     def handle_upload_progress(self, progress: dict):
         self.process_text = "Uploading file..."
         self.progress = round(progress["progress"] * 100)
+        if self.progress >= 100:
+            self.process_text = ""
+            self.process_button_is_disabled = False
 
     async def handle_upload(self, files: list[rx.UploadFile]):
         file = files[0]

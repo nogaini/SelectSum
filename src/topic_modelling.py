@@ -2,27 +2,49 @@ from bertopic import BERTopic
 from bertopic.representation import KeyBERTInspired
 from sklearn.feature_extraction.text import CountVectorizer
 from sentence_transformers import SentenceTransformer
+from umap import UMAP
 
 
-def load_topic_model() -> BERTopic:
+def load_topic_model(n_docs: int) -> BERTopic:
     representation_model = KeyBERTInspired()
     vectorizer_model = CountVectorizer(stop_words="english")
     embedding_model = SentenceTransformer("BAAI/bge-base-en-v1.5")
+
+    n_components = 5 if n_docs >= 7 else max(1, n_docs - 2)
+
+    umap_model = UMAP(
+        n_neighbors=15,
+        n_components=n_components,
+        min_dist=0.0,
+        metric="cosine",
+        low_memory=False,
+    )
+
+    if n_docs <= 100:
+        min_topic_size = 2
+    elif n_docs <= 1000:
+        min_topic_size = 5
+    elif n_docs <= 10000:
+        min_topic_size = 10
+    elif n_docs <= 100000:
+        min_topic_size = 20
+    else:
+        min_topic_size = 50
 
     topic_model = BERTopic(
         representation_model=representation_model,
         vectorizer_model=vectorizer_model,
         embedding_model=embedding_model,
-        min_topic_size=2,
+        umap_model=umap_model,
+        min_topic_size=min_topic_size,
     )
     return topic_model
 
 
-def add_topic_to_segments(
-    segments: list[dict], topic_model: BERTopic
-) -> tuple[list[dict], list[str]]:
+def add_topic_to_segments(segments: list[dict]) -> tuple[list[dict], list[str]]:
     segments_with_topics = []
     docs = [segment["text"].strip() for segment in segments]
+    topic_model = load_topic_model(len(docs))
     topics, _ = topic_model.fit_transform(docs)
     topic_dict = get_topic_dict(topic_model)
     topic_tags_list = set()

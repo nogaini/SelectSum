@@ -1,7 +1,7 @@
 import reflex as rx
 from TaSeSum.components.upload import Uploader
 
-from TaSeSum.components.summary_card import render_summary_card
+from TaSeSum.components.summary_card import render_summary_card, SummaryCardState
 from TaSeSum.components.topic_chips import TopicChipsSelector
 from TaSeSum.state import CommonState
 
@@ -14,23 +14,37 @@ from src.segment_utils import (
     add_wordcloud_to_segments,
     add_idx_to_segments,
 )
-from src.topic_modelling import (
-    load_topic_model,
-    add_topic_to_segments,
-)
+from src.topic_modelling import add_topic_to_segments
 
 
 class IndexState(CommonState):
+    progress_value: int = 0
+
     async def load(self):
         self.transcription_model = load_stable_whisper_model("tiny")
-        self.topic_model = load_topic_model()
         self.wc_generator = WordCloudGenerator()
 
     @rx.background
     async def process_video(self):
+        # Init
+        async with self:
+            (await self.get_state(SummaryCardState)).reset()
+            self.selected_items = []
+            self.segments = []
+            self.segments_in_view = []
+            self.all_items = []
+            self.process_button_is_disabled = True
+
+            self.progress_value = 50
+            self.process_text = "Transcribing..."
+
         # Transcription
         audio_path = extract_audio_from_video(str(self.video_path))
         result = self.transcription_model.transcribe(audio_path, word_timestamps=True)
+        async with self:
+            self.progress_value = 80
+            self.process_text = "Identifying topics..."
+
         result_dict = result.to_dict()
         segments = result_dict["segments"]
 
@@ -38,9 +52,11 @@ class IndexState(CommonState):
         segments = merge_segments_primary(segments)
 
         # Add topic tags
-        segments_with_topic, all_topic_tags = add_topic_to_segments(
-            segments, self.topic_model
-        )
+        segments_with_topic, all_topic_tags = add_topic_to_segments(segments)
+
+        async with self:
+            self.progress_value = 90
+            self.process_text = "Generating wordclouds..."
 
         # Secondary segment merging
         segments = merge_segments_secondary(segments_with_topic)
@@ -50,6 +66,11 @@ class IndexState(CommonState):
         segments = add_wordcloud_to_segments(segments, self.wc_generator)
 
         async with self:
+            self.progress_value = 100
+
+        async with self:
+            self.process_text = ""
+            self.progress_value = 0
             self.segments = segments
             self.segments_in_view = segments
             self.selected_items = all_topic_tags
@@ -71,7 +92,26 @@ def index() -> rx.Component:
         Uploader(),
         rx.cond(
             IndexState.video_path,
-            rx.button("Process", type="submit", on_click=IndexState.process_video),
+            rx.button(
+                "Process",
+                type="submit",
+                disabled=IndexState.process_button_is_disabled,
+                on_click=IndexState.process_video,
+            ),
+        ),
+        rx.cond(
+            IndexState.progress_value,
+            rx.progress(value=IndexState.progress_value, max=100),
+        ),
+        rx.cond(
+            IndexState.process_text,
+            rx.flex(
+                rx.spinner(size="3"),
+                rx.text(IndexState.process_text),
+                align="center",
+                justify="center",
+                gap=5,
+            ),
         ),
         rx.flex(
             rx.cond(IndexState.segments, TopicChipsSelector()),
