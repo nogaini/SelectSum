@@ -3,7 +3,7 @@
 .web
 __pycache__/
 assets/external/
+gguf/
 test_data/
 uploaded_files/
 venv/
-gguf/

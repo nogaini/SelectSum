@@ -22,11 +22,11 @@ class UploaderState(CommonState):
 
 
 def Uploader() -> rx.Component:
-    return rx.container(
+    return rx.flex(
         rx.upload(
             rx.flex(
                 rx.button(
-                    "Select File",
+                    "Select file",
                     color="rgb(107,99,246)",
                     bg="white",
                     border="1px solid rgb(107,99,246)",
@@ -41,7 +41,6 @@ def Uploader() -> rx.Component:
             ),
             id="upload",
             border="1px dotted rgb(107,99,246)",
-            padding="5em",
             on_drop=UploaderState.handle_upload(
                 rx.upload_files(
                     upload_id="upload",
@@ -58,4 +57,5 @@ def Uploader() -> rx.Component:
             rx.text(f"Selected file: {UploaderState.video_path}"),
         ),
         width="100%",
+        direction="column",
     )

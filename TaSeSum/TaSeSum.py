@@ -1,5 +1,8 @@
+from typing import Optional
+
 import reflex as rx
 from TaSeSum.components.upload import Uploader
+from TaSeSum.components.download import Downloader
 
 from TaSeSum.components.summary_card import render_summary_card, SummaryCardState
 from TaSeSum.components.topic_chips import TopicChipsSelector
@@ -17,10 +20,20 @@ from src.segment_utils import (
 from src.topic_modelling import add_topic_to_segments
 
 
+def custom_backend_handler(
+    exception: Exception,
+) -> Optional[rx.event.EventSpec]:
+    if isinstance(exception, ValueError):
+        return rx.toast.error(
+            "Video is either too short or is not transcript-heavy. Please refresh and try another video."
+        )
+
+
 class IndexState(CommonState):
     progress_value: int = 0
 
     async def load(self):
+        (await self.get_state(rx.State)).reset()
         self.transcription_model = load_stable_whisper_model("tiny")
         self.wc_generator = WordCloudGenerator()
 
@@ -89,6 +102,11 @@ def index() -> rx.Component:
             "marization of transcript-heavy videos",
             size="9",
         ),
+        rx.text(
+            "Select a local file or fetch a YouTube video.",
+            size="5",
+        ),
+        Downloader(),
         Uploader(),
         rx.cond(
             IndexState.video_path,
@@ -139,5 +157,5 @@ def index() -> rx.Component:
     )
 
 
-app = rx.App()
+app = rx.App(backend_exception_handler=custom_backend_handler)
 app.add_page(index)

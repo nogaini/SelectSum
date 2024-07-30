@@ -21,7 +21,7 @@ class SummaryFields(rx.Base):
 
 class CommonState(rx.State):
     video_path: str
-    process_button_is_disabled: bool = True
+    process_button_is_disabled: bool = False
     process_text: str
     selected_items: list[str]
     segments: list[dict]
