@@ -14,10 +14,14 @@ class DownloaderState(CommonState):
             self.process_button_is_disabled = True
             self.process_text = "Downloading video..."
         video_path = download_video(video_url)
-        async with self:
-            self.video_path = video_path
-            self.process_text = ""
-            self.process_button_is_disabled = False
+        if not video_path:
+            self.process_text = "Download failed. Please refresh and try again."
+
+        if video_path:
+            async with self:
+                self.video_path = video_path
+                self.process_text = ""
+                self.process_button_is_disabled = False
 
 
 def Downloader() -> rx.Component:

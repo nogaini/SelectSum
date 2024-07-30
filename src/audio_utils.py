@@ -9,7 +9,7 @@ def extract_audio_from_video(video_path: str) -> str:
     audio_path = f"{AUDIO_FOLDER}/{filename}.wav"
     (
         ffmpeg.input(video_path)
-        .output(audio_path, **{"q:a": 0, "map": "a"})
+        .output(audio_path, **{"q:a": 0, "map": "a"}, loglevel="quiet")
         .run(overwrite_output=True)
     )
     return audio_path

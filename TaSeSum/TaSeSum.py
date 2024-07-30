@@ -53,7 +53,7 @@ class IndexState(CommonState):
 
         # Transcription
         audio_path = extract_audio_from_video(str(self.video_path))
-        result = self.transcription_model.transcribe(audio_path, word_timestamps=True)
+        result = self.transcription_model.transcribe(audio_path, word_timestamps=False)
         async with self:
             self.progress_value = 80
             self.process_text = "Identifying topics..."
@@ -90,7 +90,7 @@ class IndexState(CommonState):
             self.all_items = all_topic_tags
 
 
-@rx.page(on_load=IndexState.load)
+@rx.page(on_load=IndexState.load, title="SelectSum")
 def index() -> rx.Component:
     return rx.flex(
         rx.text(

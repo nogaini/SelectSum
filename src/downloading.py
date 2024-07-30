@@ -11,10 +11,12 @@ def download_video(url: str) -> str:
         "format": "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]/mp4",
         "outtmpl": f"{output_template}",
     }
-
-    with yt_dlp.YoutubeDL(cfg) as video:
-        info_dict = video.extract_info(url, download=True)
-        video_id = info_dict["id"]
+    try:
+        with yt_dlp.YoutubeDL(cfg) as video:
+            info_dict = video.extract_info(url, download=True)
+            video_id = info_dict["id"]
+    except Exception as e:
+        return None
 
     output_path = f"{UPLOADS_FOLDER}/{video_id}.{ext}"
     return output_path

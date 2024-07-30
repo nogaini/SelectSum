@@ -2,4 +2,5 @@ import reflex as rx
 
 config = rx.Config(
     app_name="TaSeSum",
+    timeout=300,
 )
