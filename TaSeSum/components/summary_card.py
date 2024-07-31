@@ -13,6 +13,7 @@ class Segment(rx.Base):
     topic_tags: str
     idx: int
     wordcloud_img_path: str
+    idx_keyframe_pairs: list[list[int, str]]
 
 
 class SummaryFields(rx.Base):
@@ -21,10 +22,16 @@ class SummaryFields(rx.Base):
     bullets: list[str] = []
     trimmed_video_path: str = ""
     summary_process_text: str = ""
+    display_img: str = ""
 
 
 class SummaryCardState(CommonState):
     summary_dicts: dict[int, SummaryFields]
+    clicked_keyframe: bool = False
+
+    def set_display_image(self, segment_idx: int, kf_path: str):
+        self.summary_dicts[segment_idx]["display_img"] = kf_path
+        self.clicked_keyframe = True
 
     @rx.background
     async def generate_summary(self, segment: Segment):
@@ -52,6 +59,15 @@ class SummaryCardState(CommonState):
             self.summary_dicts[segment_idx]["summary_process_text"] = ""
 
 
+def render_kf_preview_image(idx_kf_pair: list[int, str]) -> rx.Component:
+    kf_path = idx_kf_pair[1]
+    return rx.image(
+        rx.get_upload_url(kf_path),
+        width="auto",
+        height="100px",
+    )
+
+
 def render_summary_card(segment: Segment) -> rx.Component:
     segment_idx = segment.idx
     return rx.card(
@@ -64,11 +80,22 @@ def render_summary_card(segment: Segment) -> rx.Component:
                 pb="current",
             ),
             rx.flex(
+                rx.foreach(
+                    segment.idx_keyframe_pairs,
+                    render_kf_preview_image,
+                ),
+                gap=10,
+                justify="center",
+                wrap="wrap",
+            ),
+            rx.flex(
                 status_chip(segment.topic_tags, "info", "blue"),
                 justify="center",
+                wrap="wrap",
             ),
             rx.button(
                 "Summarize",
+                align="center",
                 on_click=SummaryCardState.generate_summary(segment),
             ),
             rx.cond(

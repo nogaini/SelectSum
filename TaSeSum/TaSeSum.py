@@ -10,12 +10,14 @@ from TaSeSum.state import CommonState
 
 from src.text_utils import WordCloudGenerator
 from src.audio_utils import extract_audio_from_video
+from src.video_utils import VideoReader
 from src.transcription import load_stable_whisper_model
 from src.segment_utils import (
     merge_segments_primary,
     merge_segments_secondary,
     add_wordcloud_to_segments,
     add_idx_to_segments,
+    add_keyframes_to_segments,
 )
 from src.topic_modelling import add_topic_to_segments
 
@@ -51,6 +53,9 @@ class IndexState(CommonState):
             self.progress_value = 50
             self.process_text = "Transcribing..."
 
+        vr = VideoReader(str(self.video_path))
+        video_fps = vr.fps
+
         # Transcription
         audio_path = extract_audio_from_video(str(self.video_path))
         result = self.transcription_model.transcribe(audio_path, word_timestamps=False)
@@ -77,6 +82,13 @@ class IndexState(CommonState):
 
         # Generate wordclouds
         segments = add_wordcloud_to_segments(segments, self.wc_generator)
+
+        async with self:
+            self.progress_value = 95
+            self.process_text = "Extracting keyframes..."
+
+        # Extract keyframes
+        segments = add_keyframes_to_segments(segments, video_fps, vr)
 
         async with self:
             self.progress_value = 100
@@ -113,6 +125,7 @@ def index() -> rx.Component:
             rx.button(
                 "Process",
                 type="submit",
+                align="center",
                 disabled=IndexState.process_button_is_disabled,
                 on_click=IndexState.process_video,
             ),

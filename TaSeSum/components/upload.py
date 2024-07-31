@@ -32,7 +32,7 @@ def Uploader() -> rx.Component:
                     border="1px solid rgb(107,99,246)",
                     align="center",
                 ),
-                rx.text("Choose video file for analysis."),
+                rx.text("Select or drag and drop a video file."),
                 width="100%",
                 align="center",
                 justify="center",

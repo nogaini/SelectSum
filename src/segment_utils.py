@@ -1,7 +1,10 @@
 from src.text_utils import WordCloudGenerator
+from src.video_utils import VideoReader, write_keyframe
 
 WORDS_PER_PRIMARY_SEGMENT = 200
-WORDS_PER_SECONDARY_SEGMENT = 500
+WORDS_PER_SECONDARY_SEGMENT = 600
+
+NUM_KEYFRAMES_TO_SAMPLE = 6
 
 
 def group_segments_by_word_count(segments: list[dict]) -> list[list[dict]]:
@@ -122,4 +125,19 @@ def add_wordcloud_to_segments(
     for segment in segments:
         wc_path = wc_generator.generate_word_cloud(segment["text"])
         segment["wordcloud_img_path"] = wc_path
+    return segments
+
+
+def add_keyframes_to_segments(segments: list[dict], video_fps: float, vr: VideoReader):
+    for segment in segments:
+        segment_idx = segment["idx"]
+        segment["idx_keyframe_pairs"] = []
+
+        segment_duration = int(segment["end"] - segment["start"])
+        segment_num_frames = segment_duration * int(video_fps)
+        hop = segment_num_frames // (NUM_KEYFRAMES_TO_SAMPLE - 1)
+        sampling_range = range(0, segment_num_frames, hop)
+        for frame in vr[sampling_range]:
+            kf_path = write_keyframe(frame)
+            segment["idx_keyframe_pairs"].append([segment_idx, kf_path])
     return segments

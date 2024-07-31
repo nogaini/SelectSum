@@ -4,6 +4,7 @@ import random
 import string
 import os
 
+WORDCLOUD_MAX_WORDS = 10
 WORDCLOUD_FOLDER = f"{os.getcwd()}/uploaded_files/wordclouds"
 RX_WORDCLOUD_FOLDER = "wordclouds"
 
@@ -19,11 +20,13 @@ class WordCloudGenerator:
         self.rake = Rake()
 
     def generate_word_cloud(self, text: str) -> str:
+        os.makedirs(WORDCLOUD_FOLDER, exist_ok=True)
+
         self.rake.extract_keywords_from_text(text)
         keywords = self.rake.get_ranked_phrases()
-        wordcloud = WordCloud(height=480, width=640, max_words=20).generate(
-            " ".join(keywords)
-        )
+        wordcloud = WordCloud(
+            height=480, width=640, max_words=WORDCLOUD_MAX_WORDS
+        ).generate(" ".join(keywords))
 
         suffix = generate_random_string(10)
         save_path = f"{WORDCLOUD_FOLDER}/wordcloud_{suffix}.png"

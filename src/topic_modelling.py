@@ -13,23 +13,21 @@ def load_topic_model(n_docs: int) -> BERTopic:
     n_components = 5 if n_docs >= 7 else max(1, n_docs - 2)
 
     umap_model = UMAP(
-        n_neighbors=15,
+        n_neighbors=8,
         n_components=n_components,
         min_dist=0.0,
         metric="cosine",
         low_memory=False,
     )
 
-    if n_docs <= 100:
+    if n_docs <= 1000:
         min_topic_size = 2
-    elif n_docs <= 1000:
-        min_topic_size = 5
     elif n_docs <= 10000:
-        min_topic_size = 10
+        min_topic_size = 5
     elif n_docs <= 100000:
-        min_topic_size = 20
+        min_topic_size = 10
     else:
-        min_topic_size = 50
+        min_topic_size = 20
 
     topic_model = BERTopic(
         representation_model=representation_model,

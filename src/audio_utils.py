@@ -5,6 +5,7 @@ AUDIO_FOLDER = f"{os.getcwd()}/uploaded_files/audio"
 
 
 def extract_audio_from_video(video_path: str) -> str:
+    os.makedirs(AUDIO_FOLDER, exist_ok=True)
     filename = video_path.split("/")[-1].split(".")[0]
     audio_path = f"{AUDIO_FOLDER}/{filename}.wav"
     (

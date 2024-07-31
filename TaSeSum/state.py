@@ -9,6 +9,7 @@ class Segment(rx.Base):
     topic_tags: str
     idx: int
     wordcloud_img_path: str
+    idx_keyframe_pairs: list[list[int, str]]
 
 
 class SummaryFields(rx.Base):

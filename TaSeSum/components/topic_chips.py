@@ -70,7 +70,6 @@ def status_chip(status: str, icon: str, color: LiteralAccentColor) -> rx.Compone
         status,
         color_scheme=color,
         **status_chip_props,
-        
     )
 
 
