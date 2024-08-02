@@ -111,8 +111,9 @@ def index() -> rx.Component:
             rx.text.strong("Select"),
             "ive ",
             rx.text.strong("Sum"),
-            "marization of transcript-heavy videos",
+            "marization of speech-based videos",
             size="9",
+            align="center",
         ),
         rx.text(
             "Select a local file or fetch a YouTube video.",

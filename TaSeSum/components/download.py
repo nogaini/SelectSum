@@ -28,7 +28,7 @@ def Downloader() -> rx.Component:
     return rx.flex(
         rx.form(
             rx.flex(
-                rx.input(placeholder="Enter a YouTube URL...", name="url"),
+                rx.input(placeholder="Try a YouTube URL...", name="url"),
                 rx.button(
                     "Fetch video",
                     color="rgb(107,99,246)",
