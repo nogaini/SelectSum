@@ -1,8 +1,8 @@
 from src.text_utils import WordCloudGenerator
 from src.video_utils import VideoReader, write_keyframe
 
-WORDS_PER_PRIMARY_SEGMENT = 200
-WORDS_PER_SECONDARY_SEGMENT = 600
+WORDS_PER_PRIMARY_SEGMENT = 100
+WORDS_PER_SECONDARY_SEGMENT = 800
 
 NUM_KEYFRAMES_TO_SAMPLE = 6
 
@@ -136,8 +136,12 @@ def add_keyframes_to_segments(segments: list[dict], video_fps: float, vr: VideoR
         segment_duration = int(segment["end"] - segment["start"])
         segment_num_frames = segment_duration * int(video_fps)
         hop = segment_num_frames // (NUM_KEYFRAMES_TO_SAMPLE - 1)
-        sampling_range = range(0, segment_num_frames, hop)
+        start_frame = int(segment["start"] * video_fps)
+        end_frame = int(segment["end"] * video_fps)
+        sampling_range = range(start_frame, end_frame, hop)
         for frame in vr[sampling_range]:
+            if frame is None:
+                continue
             kf_path = write_keyframe(frame)
             segment["idx_keyframe_pairs"].append([segment_idx, kf_path])
     return segments

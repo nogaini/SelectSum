@@ -3,6 +3,7 @@ from TaSeSum.components.topic_chips import status_chip
 from TaSeSum.state import CommonState
 from src.summarization import Summarizer
 from src.video_utils import trim_video
+from src.text_utils import preprocess_bullet
 
 
 class Segment(rx.Base):
@@ -22,16 +23,10 @@ class SummaryFields(rx.Base):
     bullets: list[str] = []
     trimmed_video_path: str = ""
     summary_process_text: str = ""
-    display_img: str = ""
 
 
 class SummaryCardState(CommonState):
     summary_dicts: dict[int, SummaryFields]
-    clicked_keyframe: bool = False
-
-    def set_display_image(self, segment_idx: int, kf_path: str):
-        self.summary_dicts[segment_idx]["display_img"] = kf_path
-        self.clicked_keyframe = True
 
     @rx.background
     async def generate_summary(self, segment: Segment):
@@ -55,7 +50,9 @@ class SummaryCardState(CommonState):
         async with self:
             self.summary_dicts[segment_idx]["title"] = res.title
             self.summary_dicts[segment_idx]["summary"] = res.summary
-            self.summary_dicts[segment_idx]["bullets"] = res.bullets
+            self.summary_dicts[segment_idx]["bullets"] = [
+                preprocess_bullet(x) for x in res.bullets
+            ]
             self.summary_dicts[segment_idx]["summary_process_text"] = ""
 
 
@@ -140,7 +137,6 @@ def render_summary_card(segment: Segment) -> rx.Component:
                         rx.text(
                             SummaryCardState.summary_dicts[segment_idx].title,
                             size="7",
-                            align="center",
                         ),
                         rx.flex(
                             rx.foreach(
@@ -151,7 +147,6 @@ def render_summary_card(segment: Segment) -> rx.Component:
                         ),
                         direction="column",
                         gap=10,
-                        align="center",
                     ),
                 ),
             ),
@@ -160,4 +155,5 @@ def render_summary_card(segment: Segment) -> rx.Component:
         ),
         width="640px",
         border="1px solid #00ff44",
+        background_color="#000000",
     )

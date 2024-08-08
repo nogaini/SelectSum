@@ -117,7 +117,7 @@ def index() -> rx.Component:
         ),
         rx.text(
             "Select a local file or fetch an online video.",
-            size="5",
+            size="7",
         ),
         Downloader(),
         Uploader(),

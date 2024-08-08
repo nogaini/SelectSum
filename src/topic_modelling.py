@@ -10,7 +10,7 @@ def load_topic_model(n_docs: int) -> BERTopic:
     vectorizer_model = CountVectorizer(stop_words="english")
     embedding_model = SentenceTransformer("BAAI/bge-base-en-v1.5")
 
-    n_components = 5 if n_docs >= 7 else max(1, n_docs - 2)
+    n_components = 5 if n_docs >= 7 else max(2, n_docs - 2)
 
     umap_model = UMAP(
         n_neighbors=15,
@@ -20,21 +20,12 @@ def load_topic_model(n_docs: int) -> BERTopic:
         low_memory=False,
     )
 
-    if n_docs <= 1000:
-        min_topic_size = 2
-    elif n_docs <= 10000:
-        min_topic_size = 5
-    elif n_docs <= 100000:
-        min_topic_size = 10
-    else:
-        min_topic_size = 20
-
     topic_model = BERTopic(
         representation_model=representation_model,
         vectorizer_model=vectorizer_model,
         embedding_model=embedding_model,
         umap_model=umap_model,
-        min_topic_size=min_topic_size,
+        min_topic_size=2,
     )
     return topic_model
 
