@@ -129,7 +129,7 @@ SelectSum/
 ### Installation
 
 ```bash
-git clone https://github.com/jobini/SelectSum.git
+git clone https://github.com/nogaini/SelectSum.git
 cd SelectSum
 uv venv
 uv pip install -r requirements.txt
