@@ -4,7 +4,7 @@
 
 ---
 
-Official implementation of the paper "_SelectSum: Topic-Based Selective Summarization of Speech-Based Videos_" (accepted at MMM 2025).
+Official implementation of the paper ["_SelectSum: Topic-Based Selective Summarization of Speech-Based Videos_" (accepted at MMM 2025)](https://dl.acm.org/doi/10.1007/978-981-96-2074-6_23).
 
 ---
 
